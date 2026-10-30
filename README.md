@@ -62,6 +62,7 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
     # all phases, interval arithmetic: about 3 h on one core, or split into ranges across cores (about 44 min on 4)
     python3 cert_interval4d.py data/cert4d_h14.42.npy centre 64 0 24     # ... 24 48, 48 72, 72 96
     # lower bounds
+    python3 exact_check4d.py              # exact checks of the identities in PROOF.md (seconds)
     python3 validate4d.py                 # floating-point checks that the certificate is the Wilson Hessian
     python3 bloch4d.py                    # identity field, 9 + √17
     python3 check_field.py                # saved field, 13.974014
@@ -77,6 +78,7 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
 - `certify4d.py`: the cutting-plane SDP and the exact rational rounding.
 - `cert_interval4d.py`: the exact finite check and the interval proof.
 - `bloch4d.py`, `climb4d.py`, `check_field.py`: the lower bounds.
+- `exact_check4d.py`: exact (symbolic and combinatorial) checks of every identity in `PROOF.md`.
 - `validate4d.py`: numerical checks, not part of the proof, of the identification used by Lemma lem:cert in d = 4. It checks the plaquette rewriting against fasthess (SU(2)) and finite differences (SU(3)), the site identity, the slack decomposition, the spectrum, and the U(3)/U(4) plaquette inequality. Output in `logs/validate4d.out`.
 - `box/`: a Monte Carlo probe (not a proof) of BBL's finite-box criterion GDS for SU(2).
 - `lib/`: `torus3d.py`, `fasthess.py` and `hessian.py` from the 3D repository. The only change is the import path.

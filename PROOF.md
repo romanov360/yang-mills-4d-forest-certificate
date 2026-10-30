@@ -9,7 +9,8 @@ $$|\mathrm{Hess}\,S_0(v,v)|\ \le\ h\,|v|^2,\qquad h=\tfrac{14420001}{10^6},$$
 for every $\mathrm{SU}(N)$, $N\ge 2$, every finite box of $\mathbb Z^4$, every field, and every tangent vector
 supported on free links. It is Lemma 5.1 of the 3D paper (romanov360/yang-mills-3d-forest-gauge, `lem:cert`) with
 6 ends per site replaced by 8. Nothing else in the argument depends on the dimension. `validate4d.py` checks every
-identity below numerically (`logs/validate4d.out`), but the proof does not use it.
+identity below numerically (`logs/validate4d.out`), and `exact_check4d.py` checks the algebra and combinatorics
+exactly (`logs/exact_check4d.out`). The proof does not depend on either.
 
 ## 0. Conventions
 
@@ -198,6 +199,19 @@ Every result of BBL that uses their bound $29/2$ for this Hessian, in this gauge
 $14.420001$.
 
 ## 6. Independent checks
+
+- **`exact_check4d.py`** machine-checks Sections 0–4 exactly, with no floating point (`logs/exact_check4d.out`):
+  - **(A)** the rewriting and the $f_p$ formula, as identities of noncommutative words with $Q_iQ_i^*=1$ and traces
+    up to cyclic rotation, so they hold for every $N$;
+  - **(B)** the four corner identities, the same way;
+  - **(C)** by exhaustive enumeration on five boxes, including non-cubic ones and the 5⁴ box:
+    - the forest has no cycles and each site is the head of exactly one fixed link;
+    - every plaquette has exactly one fixed link;
+    - the certificate's corner table names the right ends, and it is the geometric table reduced mod 2;
+    - every perpendicular pair of ends occurs at exactly one corner, and no parallel pair occurs;
+  - **(D)** the splitting of Section 4, as an exact sympy polynomial identity for $\mathrm U(3)$ and $\mathrm U(4)$.
+
+  Deliberately broken copies (a wrong $\mathrm{Ad}$, a swapped product, a wrong end, a wrong corner) are rejected.
 
 - **James Lockwood** re-ran the finite and all-phase checks independently: 48 distinct $M_p$, a $128\times128$ grid,
   and an explicit second-derivative interpolation bound.

@@ -1,0 +1,10 @@
+A. Tr Q_p(t) = Tr(e^{tY1}e^{tY2}W e^{-tY3}e^{-tY4}) through order t^2, and d^2/dt^2 at 0 is the trace polynomial of f_p (10 cyclic words): exact, every N
+B. the four corner identities hold exactly: <Y1,Y4> = <o_mu,o_nu>(x); <Y1,Y2> = <i_mu,o_nu>(x+mu); <Y3,Y4> = <o_mu,i_nu>(x+nu); <Y2,WY3W*> = <i_nu,i_mu>(x+mu+nu)
+C. box (0, 0, 0, 0)..(3, 3, 3, 3): 256 sites, 768 links, 864 plaquettes: forest acyclic, one fixed link per plaquette, corner table geometric and equal to the certificate's mod 2, every perpendicular pair of ends at exactly one corner, no parallel pair
+C. box (0, 0, 0, 0)..(4, 4, 4, 4): 625 sites, 2000 links, 2400 plaquettes: forest acyclic, one fixed link per plaquette, corner table geometric and equal to the certificate's mod 2, every perpendicular pair of ends at exactly one corner, no parallel pair
+C. box (-1, 0, 2, 1)..(2, 4, 3, 5): 200 sites, 570 links, 603 plaquettes: forest acyclic, one fixed link per plaquette, corner table geometric and equal to the certificate's mod 2, every perpendicular pair of ends at exactly one corner, no parallel pair
+C. box (1, 1, 1, 1)..(2, 2, 2, 6): 48 sites, 112 links, 96 plaquettes: forest acyclic, one fixed link per plaquette, corner table geometric and equal to the certificate's mod 2, every perpendicular pair of ends at exactly one corner, no parallel pair
+C. box (0, 0, 0, 0)..(1, 1, 1, 1): 16 sites, 32 links, 24 plaquettes: forest acyclic, one fixed link per plaquette, corner table geometric and equal to the certificate's mod 2, every perpendicular pair of ends at exactly one corner, no parallel pair
+D. U(3): sum_r a_r|Y_r|^2 - f_p - c_p = sum of 3 diagonal and 3 off-diagonal U(2) pieces, exact polynomial identity in symbolic Y, W = diag(w), a, k
+D. U(4): sum_r a_r|Y_r|^2 - f_p - c_p = sum of 4 diagonal and 6 off-diagonal U(2) pieces, exact polynomial identity in symbolic Y, W = diag(w), a, k
+ALL EXACT CHECKS PASSED
