@@ -1,0 +1,29 @@
+building exact coefficient matrices ...
+  done in 3.6s
+certificate cert4d_h14.42.npy: h = 14420001/1000000 = 14.420001; mode centre; initial grid 64 x 64
+finite part (exact): 16 site matrices G_y positive definite, weights >= 0, maximum of 48 per-link totals = 14420001/1000000 (matches the stated h)
+  plaquette  0: proved, depth 6, squares so far 1028432
+  plaquette  1: proved, depth 6, squares so far 2056864
+  plaquette  2: proved, depth 6, squares so far 3085312
+  plaquette  3: proved, depth 6, squares so far 3493688
+  plaquette  4: proved, depth 6, squares so far 3902080
+  plaquette  5: proved, depth 6, squares so far 4310456
+  plaquette  6: proved, depth 6, squares so far 4718832
+  plaquette  7: proved, depth 6, squares so far 5747312
+  plaquette  8: proved, depth 6, squares so far 6155672
+  plaquette  9: proved, depth 6, squares so far 7184152
+  plaquette 10: proved, depth 6, squares so far 7592528
+  plaquette 11: proved, depth 6, squares so far 8620976
+  plaquette 12: proved, depth 6, squares so far 9649440
+  plaquette 13: proved, depth 6, squares so far 10057816
+  plaquette 14: proved, depth 6, squares so far 10466208
+  plaquette 15: proved, depth 6, squares so far 11494656
+  plaquette 16: proved, depth 6, squares so far 12523120
+  plaquette 17: proved, depth 6, squares so far 12931480
+  plaquette 18: proved, depth 6, squares so far 13339856
+  plaquette 19: proved, depth 6, squares so far 14368336
+  plaquette 20: proved, depth 6, squares so far 14776712
+  plaquette 21: proved, depth 6, squares so far 15805176
+  plaquette 22: proved, depth 6, squares so far 16213552
+  plaquette 23: proved, depth 6, squares so far 17242000
+PROVED (interval arithmetic, mode centre): plaquettes 0..23 of 96 matrices positive definite for all phases; 17242000 squares, max depth 6, 2625s
