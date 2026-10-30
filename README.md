@@ -42,16 +42,23 @@ every plaquette contains exactly one fixed link.
    nonnegative plaquette weights, all rational with denominator 10⁶. We check that every G_y is positive definite
    using exact LDLᵀ pivots, and that the maximum over the 48 free links of the per-link totals is exactly
    14420001/10⁶.
-2. **All phases (outward-rounded interval arithmetic).** For each of the 96 plaquettes, a 12×12 matrix M_p(φ) has to be
-   positive definite for every pair of phases. A quadtree starting from a 64×64 grid covers the torus of phases.
-   Each square is accepted by interval Gaussian elimination, with trigonometric values from Arb (python-flint).
-   In total there are 68,968,000 squares, the maximum depth is 6, and every plaquette is proved
-   (`logs/interval_h14.42_*.log`).
+2. **All phases (exact sum of squares, Lean kernel).** For each of the 96 plaquettes, a 12×12 matrix M_p(φ) has
+   to be positive definite for every pair of phases. In z = (1, cos φ1, sin φ1, cos φ2, sin φ2), M_p splits into two
+   6×6 blocks, and each block satisfies
+   z ⊗ x ↦ (z ⊗ x)ᵀ P (z ⊗ x) = 2²⁴·4·10⁶·xᵀM_block(φ)x on the torus, for an explicit integer 30×30 matrix P > 0.
+   Lean recomputes M_p from its definition and the certificate data, checks this polynomial identity modulo
+   cos² = 1 − sin², and checks that every P is positive definite by exact fraction-free elimination
+   (`lean/Sos4.lean`, theorems `sos_gram` and `sos_pd`). The Gram matrices (`lean/SosData.lean`) come from an SDP
+   and are rounded exactly by `lean/gen_sosdata.py`; nothing about how they were found is trusted.
 
-The interval check is a rigorous computer check, but it has not been formalized in a proof assistant. The rest of
-the finite part has been: the forest and plaquette combinatorics on all of Z⁴, the word identities of the plaquette
-rewriting and the corners, and the finite certificate checks are Lean 4 kernel theorems (`lean/`, PROOF.md
-section 6). The lemma and the general-N splitting to U(2) are not in Lean yet, because they need Mathlib.
+   The earlier, independent proof of this step is still in the repository: an outward-rounded interval quadtree
+   with Arb (python-flint), 68,968,000 squares, maximum depth 6 (`logs/interval_h14.42_*.log`).
+
+Everything in the finite part, including all phases, is now a Lean 4 kernel theorem (`lean/`, PROOF.md section 6),
+along with the forest and plaquette combinatorics on all of Z⁴ and the word identities of the plaquette rewriting and
+the corners. Three steps remain written proofs, checked exactly in sympy but not in Lean: the lemma, the general-N
+splitting to U(2), and the identification of the Hessian with Σ f_p. They need real matrices and calculus, so
+Mathlib.
 
 `PROOF.md` gives the written proof that these checks bound the Wilson Hessian: the plaquette rewriting, the site
 identity with 8 ends per site, the lemma, and the reduction from U(N) to U(2) phases.
@@ -62,11 +69,11 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
 
     # finite part, exact (seconds)
     python3 cert_interval4d.py data/cert4d_h14.42.npy finite
-    # all phases, interval arithmetic: about 3 h on one core, or split into ranges across cores (about 44 min on 4)
+    # all phases, interval arithmetic (independent of the Lean SOS check): about 3 h on one core, or split into ranges across cores (about 44 min on 4)
     python3 cert_interval4d.py data/cert4d_h14.42.npy centre 64 0 24     # ... 24 48, 48 72, 72 96
     # lower bounds
     python3 exact_check4d.py              # exact checks of the identities in PROOF.md (seconds)
-    lean/check.sh                         # Lean 4.19.0 kernel checks, core only, no Mathlib (about 1 min)
+    lean/check.sh                         # Lean 4.19.0 kernel checks, core only, no Mathlib (about 10 min on 4 cores)
     python3 validate4d.py                 # floating-point checks that the certificate is the Wilson Hessian
     python3 bloch4d.py                    # identity field, 9 + √17
     python3 check_field.py                # saved field, 13.974014
@@ -85,7 +92,9 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
 - `exact_check4d.py`: exact (symbolic and combinatorial) checks of every identity in `PROOF.md`.
 - `lean/`: Lean 4 kernel proofs. `Forest4.lean` covers the forest, one fixed link per plaquette and corners on Z⁴;
   `Words4.lean` the word identities; `Cert4.lean` the finite certificate checks, run on `CertData.lean`, which
-  `gen_certdata.py` writes. Run `check.sh`; output in `logs/lean_check.out`.
+  `gen_certdata.py` writes; `Sos4.lean` the all-phase sum-of-squares check, run on `SosData.lean`, which
+  `gen_sosdata.py` writes, split into the chunks `SosG0..3`, `SosP0..3` and assembled in `SosAll.lean`.
+  Run `check.sh`; output in `logs/lean_check.out`.
 - `validate4d.py`: numerical checks, not part of the proof, of the identification used by Lemma lem:cert in d = 4. It checks the plaquette rewriting against fasthess (SU(2)) and finite differences (SU(3)), the site identity, the slack decomposition, the spectrum, and the U(3)/U(4) plaquette inequality. Output in `logs/validate4d.out`.
 - `box/`: a Monte Carlo probe (not a proof) of BBL's finite-box criterion GDS for SU(2).
 - `lib/`: `torus3d.py`, `fasthess.py` and `hessian.py` from the 3D repository. The only change is the import path.

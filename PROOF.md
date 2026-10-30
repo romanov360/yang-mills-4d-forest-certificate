@@ -185,7 +185,7 @@ The hypotheses of the lemma are exactly what the computer checks establish:
 | $G_y$ symmetric, $G_y[o_\mu,i_\mu]=0$, positive definite (exact $LDL^T$ pivots) | `cert_interval4d.py … finite` |
 | $a_{p,r}\ge0$, carried only on the free positions | `cert_interval4d.py … finite` |
 | maximum of the 48 per-link totals is exactly $14420001/10^6$ | `cert_interval4d.py … finite` |
-| $M_p(\varphi)\succ0$ for all $\varphi\in[0,2\pi)^2$, all 96 plaquettes | `cert_interval4d.py … centre` (interval quadtree), logs `interval_h14.42_*.log` |
+| $M_p(\varphi)\succ0$ for all $\varphi\in[0,2\pi)^2$, all 96 plaquettes | Lean `sos_gram`, `sos_pd` (exact sum of squares); independently `cert_interval4d.py … centre` (interval quadtree), logs `interval_h14.42_*.log` |
 
 By periodicity, each plaquette and site of $\mathbb Z^4$ uses the data of its class mod 2. In the period cell, two
 plaquettes can share two links, but this never matters: identities (2.1) and (3.1) are applied on $\mathbb Z^4$,
@@ -237,8 +237,29 @@ $14.420001$.
     - the plaquettes containing each free link are found geometrically, and each per-link total is at most $h$, with
       maximum exactly $14420001/10^6$ (`totals_ok`, `totals_max`).
 
-  Deliberately broken copies (a wrong pattern, a wrong $\mathrm{Ad}$ in $Y_2$, $h$ lowered by $10^{-6}$) are
-  rejected. Lean does not check two things:
-  - Section 3 (the lemma) and the general-$N$ splitting of Section 4 need real matrices, which in practice means
-    Mathlib;
-  - the all-phase interval cover (68,968,000 squares) stays an outward-rounded Arb computation.
+  - `Sos4.lean`, the all-phase part of Section 5, on the Gram matrices in `SosData.lean`. Write
+    $z=(1,c_1,s_1,c_2,s_2)$ with $c_a=\cos\varphi_a$, $s_a=\sin\varphi_a$. Lean recomputes $4\cdot10^6M_p$ from the
+    plaquette form of Section 1 and the certificate (weights, corner coefficients $2G_s[r,q]$), in the basis
+    $B_q/\sqrt2$ of $\mathfrak u(2)$, as a polynomial matrix in $z$. It then checks:
+    - $M_p$ splits into the blocks $q\in\{0,3\}$ and $q\in\{1,2\}$ (`sos_gram`);
+    - for each block, with an integer symmetric $30\times30$ matrix $P$,
+      $\sum_{a,b}z_az_bP[6a+i,6b+k]=2^{24}\cdot4\cdot10^6M_{\text{block}}[i,k]$ as polynomials modulo
+      $c_a^2=1-s_a^2$ (`sos_gram`);
+    - every $P$ is positive definite, by fraction-free elimination: $p\,x^{\mathsf T}Px=(px_0+r\cdot x')^2+
+      x'^{\mathsf T}(pP'-rr^{\mathsf T})x'$ with $p=P_{00}>0$, and $pP'-rr^{\mathsf T}$ is the previous pivot times an
+      integer matrix that is treated the same way (`sos_pd`).
+
+    On the torus, for $x\ne0$ and $w=z\otimes x\ne0$ (since $z_0=1$), this gives
+    $2^{24}\cdot4\cdot10^6\,x^{\mathsf T}M_{\text{block}}(\varphi)x=w^{\mathsf T}Pw>0$. The check is split into eight
+    chunks run in parallel and assembled in `SosAll.lean`.
+
+  Deliberately broken copies (a wrong pattern, a wrong $\mathrm{Ad}$ in $Y_2$, $h$ lowered by $10^{-6}$, one Gram
+  entry changed by 1, one plaquette weight changed by $10^{-6}$, an indefinite $P$) are rejected. Lean does not check
+  three things, which stay written proofs (checked exactly by `exact_check4d.py`):
+  - Section 3 (the lemma);
+  - the general-$N$ splitting of Section 4;
+  - the identification of the Wilson Hessian with $\sum_pf_p$ (Section 1).
+
+  These need real matrices, $\mathrm U(N)$ and second derivatives, which in practice means Mathlib. The last step
+  from the Lean statements to "$M_p(\varphi)\succ0$" (sum of squares implies positive definite, and $z$ lies on
+  the torus) is the two-line argument above; it is not itself a Lean theorem.
