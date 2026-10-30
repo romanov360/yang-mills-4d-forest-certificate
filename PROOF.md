@@ -221,3 +221,24 @@ $14.420001$.
   - (3.1) at random $\mathrm U(3)$ and $\mathrm U(4)$ points.
 
   The largest discrepancies are $4\times10^{-11}$ and $4\times10^{-15}$, and all slacks are positive.
+- **Lean 4 kernel** (`lean/`, Lean 4.19.0, core library only; run `lean/check.sh`, output in `logs/lean_check.out`).
+  Every statement below is a theorem checked by the kernel, with no `sorry` and no axioms beyond Lean's standard
+  `propext`, `Quot.sound` and `Classical.choice`:
+  - `Forest4.lean`, Section 0, for all of $\mathbb Z^4$ and not just a box: every site is the head of exactly one fixed
+    link (`head_unique`); every finite set of fixed links has a leaf, so they contain no cycle (`forest_leaf`); and
+    every plaquette has exactly one fixed link (`one_fixed`);
+  - `Forest4.lean`, Section 2: each corner names the right two ends (`corner_ends`), and every perpendicular pair of
+    ends at a site is a corner of exactly one plaquette, while no parallel pair is (`corner_cover`);
+  - `Words4.lean`, Sections 1–2: identities (A) and (B) above, as integer word identities (`rewriting`, `corners`);
+  - `Cert4.lean`, the finite part of Section 5, all on the 10⁶-scaled integer certificate in `CertData.lean`:
+    - each $G_y$ is symmetric, with $G_y[o_\mu,i_\mu]=0$, and PSD by an explicit sum of squares
+      $S_yG_y=\sum_kc_ku_ku_k^{\mathsf T}$ with $S_y,c_k>0$ (`sites_ok`);
+    - every weight is $\ge0$ and is $0$ at the fixed link (`weights_ok`);
+    - the plaquettes containing each free link are found geometrically, and each per-link total is at most $h$, with
+      maximum exactly $14420001/10^6$ (`totals_ok`, `totals_max`).
+
+  Deliberately broken copies (a wrong pattern, a wrong $\mathrm{Ad}$ in $Y_2$, $h$ lowered by $10^{-6}$) are
+  rejected. Lean does not check two things:
+  - Section 3 (the lemma) and the general-$N$ splitting of Section 4 need real matrices, which in practice means
+    Mathlib;
+  - the all-phase interval cover (68,968,000 squares) stays an outward-rounded Arb computation.

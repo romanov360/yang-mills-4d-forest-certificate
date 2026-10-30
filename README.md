@@ -48,14 +48,17 @@ every plaquette contains exactly one fixed link.
    In total there are 68,968,000 squares, the maximum depth is 6, and every plaquette is proved
    (`logs/interval_h14.42_*.log`).
 
-The interval check is a rigorous computer check, but it has not been formalized in a proof assistant.
+The interval check is a rigorous computer check, but it has not been formalized in a proof assistant. The rest of
+the finite part has been: the forest and plaquette combinatorics on all of Z⁴, the word identities of the plaquette
+rewriting and the corners, and the finite certificate checks are Lean 4 kernel theorems (`lean/`, PROOF.md
+section 6). The lemma and the general-N splitting to U(2) are not in Lean yet, because they need Mathlib.
 
 `PROOF.md` gives the written proof that these checks bound the Wilson Hessian: the plaquette rewriting, the site
 identity with 8 ends per site, the lemma, and the reduction from U(N) to U(2) phases.
 
 ## Reproduce
 
-Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint.
+Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint; Lean 4.19.0 for `lean/`.
 
     # finite part, exact (seconds)
     python3 cert_interval4d.py data/cert4d_h14.42.npy finite
@@ -63,6 +66,7 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
     python3 cert_interval4d.py data/cert4d_h14.42.npy centre 64 0 24     # ... 24 48, 48 72, 72 96
     # lower bounds
     python3 exact_check4d.py              # exact checks of the identities in PROOF.md (seconds)
+    lean/check.sh                         # Lean 4.19.0 kernel checks, core only, no Mathlib (about 1 min)
     python3 validate4d.py                 # floating-point checks that the certificate is the Wilson Hessian
     python3 bloch4d.py                    # identity field, 9 + √17
     python3 check_field.py                # saved field, 13.974014
@@ -79,6 +83,9 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
 - `cert_interval4d.py`: the exact finite check and the interval proof.
 - `bloch4d.py`, `climb4d.py`, `check_field.py`: the lower bounds.
 - `exact_check4d.py`: exact (symbolic and combinatorial) checks of every identity in `PROOF.md`.
+- `lean/`: Lean 4 kernel proofs. `Forest4.lean` covers the forest, one fixed link per plaquette and corners on Z⁴;
+  `Words4.lean` the word identities; `Cert4.lean` the finite certificate checks, run on `CertData.lean`, which
+  `gen_certdata.py` writes. Run `check.sh`; output in `logs/lean_check.out`.
 - `validate4d.py`: numerical checks, not part of the proof, of the identification used by Lemma lem:cert in d = 4. It checks the plaquette rewriting against fasthess (SU(2)) and finite differences (SU(3)), the site identity, the slack decomposition, the spectrum, and the U(3)/U(4) plaquette inequality. Output in `logs/validate4d.out`.
 - `box/`: a Monte Carlo probe (not a proof) of BBL's finite-box criterion GDS for SU(2).
 - `lib/`: `torus3d.py`, `fasthess.py` and `hessian.py` from the 3D repository. The only change is the import path.

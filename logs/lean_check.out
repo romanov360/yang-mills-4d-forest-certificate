@@ -1,0 +1,21 @@
+wrote CertData.lean: 16 sites, 96 plaquettes, h = 14420001 / 10^6
+== Forest4
+'head_unique' depends on axioms: [propext, Classical.choice, Quot.sound]
+'forest_leaf' depends on axioms: [propext, Classical.choice, Quot.sound]
+'one_fixed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'corner_ends' depends on axioms: [propext, Quot.sound]
+'corner_cover' depends on axioms: [propext, Quot.sound]
+== CertData
+== Cert4
+'sites_ok' does not depend on any axioms
+'weights_ok' depends on axioms: [propext]
+'totals_ok' depends on axioms: [propext]
+'totals_max' depends on axioms: [propext]
+== Words4
+'rewriting' does not depend on any axioms
+'corners' does not depend on any axioms
+all Lean checks passed
+
+real	0m59.942s
+user	0m51.100s
+sys	0m11.872s
