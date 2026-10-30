@@ -11,11 +11,29 @@ wrote CertData.lean: 16 sites, 96 plaquettes, h = 14420001 / 10^6
 'weights_ok' depends on axioms: [propext]
 'totals_ok' depends on axioms: [propext]
 'totals_max' depends on axioms: [propext]
+== SosData
+== Sos4
 == Words4
 'rewriting' does not depend on any axioms
 'corners' does not depend on any axioms
+== SosG0..7, SosP0..7
+SosG1 ok
+SosG0 ok
+SosP0 ok
+SosP1 ok
+SosG2 ok
+SosP2 ok
+SosG3 ok
+SosP3 ok
+SosG4 ok
+SosG5 ok
+SosP4 ok
+SosP5 ok
+SosG6 ok
+SosG7 ok
+SosP6 ok
+SosP7 ok
+== SosAll
+'sos_gram' depends on axioms: [propext, Quot.sound]
+'sos_pd' depends on axioms: [propext]
 all Lean checks passed
-
-real	0m59.942s
-user	0m51.100s
-sys	0m11.872s
