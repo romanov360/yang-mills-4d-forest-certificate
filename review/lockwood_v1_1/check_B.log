@@ -1,0 +1,4 @@
+(1) h = 2877/200 = 14.385  [weights 20547/10000, 12471/10000, 459/500]
+(2) diagonal part: minimal exact LDL pivot over 4 positions x (W = +1, -1) = 46826613/84630790000 > 0
+(3) pair part: 105770 stored intervals tile [0, 2 pi] exactly for all 4 positions and all pass (14s)
+CERTIFICATE VALID: h_F <= 2877/200

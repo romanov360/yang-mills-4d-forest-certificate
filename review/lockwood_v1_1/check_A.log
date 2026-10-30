@@ -1,0 +1,4 @@
+(1) h = 14420001/1000000 = 14.420001  [weights 8320001/4000000, 5/4, 9/10]
+(2) diagonal part: minimal exact LDL pivot over 4 positions x (W = +1, -1) = 8320001/16640004000000 > 0
+(3) pair part: 107890 stored intervals tile [0, 2 pi] exactly for all 4 positions and all pass (14s)
+CERTIFICATE VALID: h_F <= 14420001/1000000

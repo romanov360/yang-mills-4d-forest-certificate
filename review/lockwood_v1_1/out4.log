@@ -1,0 +1,2 @@
+N=4: fast vs slow lambda_min max diff 1.5e-15
+N=4: 2000 Haar-ish W: min 9.134868e-05; 80 Nelder-Mead runs: min 8.716949e-05 (k=1, sign=1); Lemma 2 predicts 8.716949e-05
