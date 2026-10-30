@@ -55,5 +55,22 @@ def main():
               f"{vu / asig:12.3f}({eu / asig:.3f}) {'n=%d: %.3f(%.3f)' % (n2, vr, er):>27}")
 
 
+
+
+def multi(paths, tsig=(0.045, 0.1, 0.2)):
+    """E_k/sqrt(sigma) at several flow times, for runs made with `su2_slice.py multi`."""
+    print(f"{'beta':>5} {'ncfg':>5} {'a*sqrt(s)':>9} " + " ".join(f"{'tau*s=%g' % t:>14}" for t in tsig)
+          + f" {'unflowed':>14}")
+    for path in paths:
+        X = np.load(path)
+        beta = float(path.split("_b")[-1].split("_")[0])
+        T = (X.shape[1] - 1) // (len(tsig) + 1)
+        asig = A_SQRT_SIGMA[beta]
+        lg = lambda E: -np.log(gamma(E, 1)[1] / gamma(E, 1)[0])
+        cols = [X[:, 1 + T * (j + 1):1 + T * (j + 2)] for j in range(len(tsig))] + [X[:, 1:1 + T]]
+        res = [jackknife(E, lg, min(20, len(X))) for E in cols]
+        print(f"{beta:5.2f} {len(X):5d} {asig:9.4f} " + " ".join(f"{v / asig:7.3f}({e / asig:.3f})" for v, e in res))
+
+
 if __name__ == "__main__":
-    main()
+    multi(sys.argv[2:]) if sys.argv[1] == "multi" else main()

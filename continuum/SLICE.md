@@ -134,7 +134,36 @@ Checks: the plaquette agrees with the literature (0.6023 at β = 2.3, 0.6517 at 
 gauge covariant (difference 10⁻¹⁴ under a random gauge transformation). The energy decreases along the flow.
 Changing the step from ε = 0.05 to 0.01 changes the result by 10⁻⁴.
 
-RESULTS_TABLE
+Zero-momentum slice field, τσ = 0.045 (`python3 analyse.py data/b2*.npy`; β = 2.5 pools three independent chains):
+
+| β | L = T | configs | a√σ | 1/(a√σ) | E_k/√σ, flowed | E_k/√σ, unflowed | κ_k/√σ (linear form) |
+|---|---|---|---|---|---|---|---|
+| 2.3 | 8 | 400 | 0.369 | 2.71 | 4.41(26) | 6.0(6) | 2.18(5) |
+| 2.4 | 12 | 300 | 0.266 | 3.76 | 4.59(17) | 7.8(6) | 2.65(5) |
+| 2.5 | 16 | 162 | 0.188 | 5.32 | 5.75(32) | 13.4(14) | 3.52(11) |
+
+Several flow times in one run (`su2_slice.py multi`, `python3 analyse.py multi data/multi_*.npy`):
+
+| β | configs | τσ = 0.045 | τσ = 0.1 | τσ = 0.2 | unflowed |
+|---|---|---|---|---|---|
+| 2.3 | 400 | 3.87(17) | 3.68(16) | 4.22(23) | 5.6(4) |
+
+Reading, with caution:
+
+- **Unflowed** E_k grows like 1/a: 6.0 → 7.8 → 13.4, against the 1/a ratios 1 : 1.39 : 1.96. This is the
+  ultraviolet weight that the flow is there to remove. It confirms that the observable is sensitive to the
+  failure (S) is meant to exclude.
+- **Flowed** E_k stays near the scale of the lightest SU(2) glueball (m₀₊₊ ≈ 3.7–4√σ) at the two coarser
+  couplings, and does not decrease as the flow time is raised fourfold at β = 2.3. That is the behaviour of a
+  slice vector dominated by finite-energy states.
+- At β = 2.5 it is higher, 5.75(32) against 4.59(17). That gap is about 3σ, but two independent runs at β = 2.3
+  differ by 1.7σ (4.41 against 3.87), so the jackknife errors probably understate the autocorrelation. More
+  importantly, τ/a² is only 0.33, 0.64 and 1.27 at τσ = 0.045. The coarse points are not in the regime
+  √(8τ) ≫ a, where the flowed field is the continuum one. The data **do not decide** whether E_k converges.
+  Deciding it needs a ≲ 0.1/√σ (β ≥ 2.7, L ≥ 32) at τσ ≈ 0.1–0.2. That is a GPU job (section 6).
+- The physical-distance ratio D(r)/D(0) at r√σ ≈ 0.74 is 0.08(2), 0.05(2), 0.01(2). It is already at the noise
+  level. This is why the one-step form is the measurable one.
+
 
 ## 6. Next steps
 

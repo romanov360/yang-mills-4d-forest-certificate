@@ -169,6 +169,51 @@ def plaquette(U):
     return tot / 6
 
 
+def flow_checkpoints(U, taus, eps):
+    """Flow incrementally and return the flowed slice energies at each flow time in taus (increasing)."""
+    out, V, t = [], U, 0.0
+    for tau in taus:
+        V = spatial_flow(V, tau - t, eps) if tau > t else V
+        t = tau
+        out.append(slice_energy(V))
+    return out
+
+
+def main_multi():
+    """Usage: su2_slice.py multi BETA L T NTHERM NMEAS SEP SEED OUT TAU_SIGMA1,TAU_SIGMA2,..."""
+    beta, L, T, ntherm, nmeas, sep, seed, out = (
+        float(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]),
+        int(sys.argv[6]), int(sys.argv[7]), int(sys.argv[8]), sys.argv[9])
+    tsig = [float(x) for x in sys.argv[10].split(",")]
+    asig = A_SQRT_SIGMA[beta]
+    taus = [ts / asig ** 2 for ts in tsig]
+    rng = np.random.default_rng(seed)
+    shape = (T, L, L, L)
+    m = parity_mask(shape)
+    masks = (m, ~m)
+    U = np.zeros((4,) + shape + (4,))
+    U[..., 0] = 1.0
+    t0 = time.time()
+    for it in range(ntherm):
+        heatbath(U, beta, rng, masks)
+        for _ in range(3):
+            overrelax(U, masks)
+        U = renorm(U)
+    print(f"beta={beta} L={L} T={T} tau*sigma={tsig} tau/a^2={[round(t, 3) for t in taus]} "
+          f"therm {time.time() - t0:.0f}s", flush=True)
+    rows = []
+    for it in range(nmeas):
+        for _ in range(sep):
+            heatbath(U, beta, rng, masks)
+            for _ in range(3):
+                overrelax(U, masks)
+        U = renorm(U)
+        rows.append(np.concatenate([[plaquette(U)], slice_energy(U)] + flow_checkpoints(U, taus, 0.04)))
+        if it % 10 == 0:
+            print(f"  meas {it} t={time.time() - t0:.0f}s", flush=True)
+        np.save(out, np.array(rows))
+
+
 def main():
     beta, L, T, ntherm, nmeas, sep, tau_sigma, seed, out = (
         float(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]),
@@ -209,4 +254,4 @@ def main():
 A_SQRT_SIGMA = {2.3: 0.3690, 2.4: 0.2660, 2.5: 0.1881, 2.6: 0.1326, 2.7: 0.0911}
 
 if __name__ == "__main__":
-    main()
+    main_multi() if sys.argv[1] == "multi" else main()

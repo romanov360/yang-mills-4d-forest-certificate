@@ -1,0 +1,5 @@
+beta=2.5 L=16 T=16 a*sqrt(sigma)=0.1881 tau/a^2=1.2718 therm 528s plaq=0.652123
+  meas 0 plaq=0.651602 t=551s
+  meas 10 plaq=0.650744 t=775s
+  meas 20 plaq=0.650623 t=1006s
+  meas 30 plaq=0.652565 t=1240s
