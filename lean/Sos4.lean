@@ -182,8 +182,4 @@ def pdAux : Nat → Int → List (List Int) → Bool
 def pdCheck (T : List (List Int)) : Bool :=
   triOK T && pdAux 30 1 (full T)
 
-/-- both Gram matrices of certificate c are positive definite. -/
-def pdPair (c : Nat) : Bool := let (PD, PO) := sosCerts.getD c ([], []); pdCheck PD && pdCheck PO
-
 theorem plaqs_length : plaqs.length = 96 := by decide +kernel
-theorem certs_length : sosCerts.length = 48 := by decide +kernel

@@ -250,8 +250,8 @@ $14.420001$.
       integer matrix that is treated the same way (`sos_pd`).
 
     On the torus, for $x\ne0$ and $w=z\otimes x\ne0$ (since $z_0=1$), this gives
-    $2^{24}\cdot4\cdot10^6\,x^{\mathsf T}M_{\text{block}}(\varphi)x=w^{\mathsf T}Pw>0$. The check is split into eight
-    chunks run in parallel and assembled in `SosAll.lean`.
+    $2^{24}\cdot4\cdot10^6\,x^{\mathsf T}M_{\text{block}}(\varphi)x=w^{\mathsf T}Pw>0$. There is one kernel theorem per
+    plaquette and per Gram matrix (16 files, run in parallel), assembled in `SosAll.lean`.
 
   Deliberately broken copies (a wrong pattern, a wrong $\mathrm{Ad}$ in $Y_2$, $h$ lowered by $10^{-6}$, one Gram
   entry changed by 1, one plaquette weight changed by $10^{-6}$, an indefinite $P$) are rejected. Lean does not check

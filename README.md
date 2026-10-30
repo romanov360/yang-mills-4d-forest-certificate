@@ -73,7 +73,7 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
     python3 cert_interval4d.py data/cert4d_h14.42.npy centre 64 0 24     # ... 24 48, 48 72, 72 96
     # lower bounds
     python3 exact_check4d.py              # exact checks of the identities in PROOF.md (seconds)
-    lean/check.sh                         # Lean 4.19.0 kernel checks, core only, no Mathlib (about 10 min on 4 cores)
+    lean/check.sh                         # Lean 4.19.0 kernel checks, core only, no Mathlib (about 15 min on 4 cores)
     python3 validate4d.py                 # floating-point checks that the certificate is the Wilson Hessian
     python3 bloch4d.py                    # identity field, 9 + √17
     python3 check_field.py                # saved field, 13.974014
@@ -93,7 +93,8 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
 - `lean/`: Lean 4 kernel proofs. `Forest4.lean` covers the forest, one fixed link per plaquette and corners on Z⁴;
   `Words4.lean` the word identities; `Cert4.lean` the finite certificate checks, run on `CertData.lean`, which
   `gen_certdata.py` writes; `Sos4.lean` the all-phase sum-of-squares check, run on `SosData.lean`, which
-  `gen_sosdata.py` writes, split into the chunks `SosG0..3`, `SosP0..3` and assembled in `SosAll.lean`.
+  `gen_sosdata.py` writes, with one theorem per plaquette (`SosG0..7`) and per Gram matrix (`SosP0..7`),
+  assembled in `SosAll.lean`.
   Run `check.sh`; output in `logs/lean_check.out`.
 - `validate4d.py`: numerical checks, not part of the proof, of the identification used by Lemma lem:cert in d = 4. It checks the plaquette rewriting against fasthess (SU(2)) and finite differences (SU(3)), the site identity, the slack decomposition, the spectrum, and the U(3)/U(4) plaquette inequality. Output in `logs/validate4d.out`.
 - `box/`: a Monte Carlo probe (not a proof) of BBL's finite-box criterion GDS for SU(2).
