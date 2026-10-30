@@ -50,6 +50,9 @@ every plaquette contains exactly one fixed link.
 
 The interval check is a rigorous computer check, but it has not been formalized in a proof assistant.
 
+`PROOF.md` gives the written proof that these checks bound the Wilson Hessian: the plaquette rewriting, the site
+identity with 8 ends per site, the lemma, and the reduction from U(N) to U(2) phases.
+
 ## Reproduce
 
 Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint.
@@ -68,6 +71,7 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
 
 ## Files
 
+- `PROOF.md`: the analytic identification of the certificate with the Wilson Hessian in d = 4.
 - `forest4d.py`: the d = 4 period-2 forest and its period cell.
 - `certificate3d.py`: the u(2) quadratic forms, unchanged from the 3D repository (they do not depend on d).
 - `certify4d.py`: the cutting-plane SDP and the exact rational rounding.
