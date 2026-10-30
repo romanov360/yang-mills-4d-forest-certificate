@@ -32,3 +32,22 @@ push the coupling up.
 The difficulty is that κ_V(y, b) is a supremum over boundary holonomies of the disagreement probabilities of a
 coupling. That is an integral over SU(2)^|V| inside a supremum, so a certified computation needs rigorous
 quadrature and a cover of the boundary data.
+
+## Recorded for later: a box coupling that integrates out the links near y
+
+The Monte Carlo probe in `box/` shows that the naive coupling cannot certify a box. That coupling is link-by-link
+heat bath with a maximal coupling at each update. It gives r < 1 only for β_W below about 0.2 (d = 4, L = 3), which
+is under the 0.345 already proved, so it only reproduces single-site Dobrushin ranges. In d = 2 it fails at β = 2,
+where BBL's Prop. prop:2d succeeds.
+
+The plan, modelled on Prop. prop:2d:
+
+1. Integrate out exactly the links of V that share a plaquette with the boundary link y, by character expansion in
+   SU(2) (Bessel-function coefficients). The result is the marginal law of the remaining links, given the boundary.
+2. Couple that marginal maximally between ω and ω' (they differ only at y). The disagreement probability is then a
+   total-variation distance of explicit one- or few-link densities, rather than a product of per-update
+   disagreements.
+3. Bound the supremum over boundary holonomies with interval arithmetic on the class functions (they depend only on
+   traces), so that the cover of the boundary data is low-dimensional.
+4. First target: GDS(V, ε) for SU(2), d = 4, on the L = 2 or 3 box at β_W = 0.3, where the answer is known. Then
+   push past 0.345.

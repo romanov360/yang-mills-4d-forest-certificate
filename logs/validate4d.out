@@ -1,0 +1,11 @@
+   SU(2) trial 0: Hess = -214.941130, sum f_p = -214.941130, site identity residual +1.8e-12
+   SU(2) trial 1: Hess = -105.557005, sum f_p = -105.557005, site identity residual +1.8e-12
+   SU(2) trial 2: Hess = -9.260972, sum f_p = -9.260972, site identity residual +5.5e-12
+   SU(3) trial 0: Hess = -765.798608, sum f_p = -765.798608, site identity residual -2.2e-11
+   SU(3) trial 1: Hess = -734.964167, sum f_p = -734.964167, site identity residual +1.5e-11
+1. plaquette rewriting (SU(2) vs fasthess, SU(3) vs finite differences): max relative discrepancy 4.3e-11
+2. site identity: max relative discrepancy 3.5e-15
+3. totals <= h at every free link; sum_p slack and sum_y site form: least normalised value 3.6450 (must be >= 0)
+4. eigenvalues of the gauge-fixed Hessian on 22 fields in [-13.1231, 13.9740], h = 14.420001
+5. U(3) plaquette inequality at 3000 random points: least normalised slack 0.53396 (must be > 0)
+5. U(4) plaquette inequality at 3000 random points: least normalised slack 0.78505 (must be > 0)
