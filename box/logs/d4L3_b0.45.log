@@ -1,1 +1,2 @@
 d=4 L=3 |V|=96 free=80 |dV|=288 n_min=24 classes=[192, 96] R=500 sweeps=100
+beta_W=0.450  r=K/n_min=10.1295  per-class sum_b kappa=3.1139 3.9017
