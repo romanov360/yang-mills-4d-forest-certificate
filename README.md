@@ -63,6 +63,13 @@ Mathlib.
 `PROOF.md` gives the written proof that these checks bound the Wilson Hessian: the plaquette rewriting, the site
 identity with 8 ends per site, the lemma, and the reduction from U(N) to U(2) phases.
 
+## GPU runs for the continuum question (separate from the certificate)
+
+`gpu-slice/` is a JAX port, with a Modal launcher, of the SU(2) Monte Carlo behind the continuum note
+`yang-mills-continuum/SLICE.md` in romanov360/big-bang-monotile. It measures whether a one-step bound that implies
+BBL's slice ratio holds at fine lattice spacing in d = 4. It does not use or affect the certificate. See
+`gpu-slice/README.md`.
+
 ## Reproduce
 
 Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint; Lean 4.19.0 for `lean/`.
