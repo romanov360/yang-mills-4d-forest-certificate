@@ -171,6 +171,12 @@ growing like 1/a, which shows the observable can detect a divergence. If the flo
 β = 2.7–2.85 for every flow time, the one-step route to the slice ratio fails in d = 4 for this observable.
 The slice ratio itself could still hold, because Proposition S is only sufficient.
 
+**The slice ratio itself.** `analyse_jax.py` also prints D(r)/D(0) at r = 0.5 and 1 √τ, the quantity BBL's theorem
+actually needs. The next-order analysis (big-bang-monotile, `yang-mills-continuum/LEAKAGE.md`) shows that the one-step
+E_k carries a fixed-order logarithm from a small-norm hard-pair component of the state. With asymptotic freedom that
+logarithm becomes a slow drift of a few percent. The slice ratio at fixed physical r should be insensitive to it, so
+report both.
+
 **What "bounded" should look like.** For free gluons (leading-order perturbation theory, script `pert_slice.py`
 in big-bang-monotile/yang-mills-continuum), E_k on these exact lattices is finite and approaches its continuum
 value from below:

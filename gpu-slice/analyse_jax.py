@@ -41,6 +41,27 @@ def effective_energy(npy, meta_path=None, X=None):
     return [(v / asig, e / asig) for v, e in res]
 
 
+def slice_ratio(npy, r_sqrt_tau=(0.5, 1.0), meta_path=None, X=None):
+    """D(r)/D(0) of the flowed slice field at physical separations r = c sqrt(tau) (rounded to lattice steps),
+    for each flow time: [(tau_sigma, c, n_steps, value, error)].  This is the slice ratio itself; unlike the one-step
+    E_k it is not sensitive to the small-norm hard-pair component of the state (yang-mills-continuum/LEAKAGE.md)."""
+    meta = json.load(open(meta_path or npy[:-4] + ".json"))
+    X = np.load(npy) if X is None else X
+    T, asig = meta["T"], meta["a_sqrt_sigma"]
+    cols = columns(X, T, len(meta["tau_sigma"]))
+    out = []
+    for ts, E in zip(meta["tau_sigma"], cols[1:]):
+        sqrt_tau = np.sqrt(ts) / asig                       # in lattice units
+        for c in r_sqrt_tau:
+            n = max(1, int(round(c * sqrt_tau)))
+            if n >= T // 2:
+                continue
+            f = lambda E, n=n: gamma(E, n)[n] / gamma(E, n)[0]
+            v, e = jackknife(E, f, min(20, len(X)))
+            out.append((ts, c, n, v, e))
+    return out
+
+
 def main():
     groups = defaultdict(list)
     for path in sys.argv[1:]:
@@ -55,6 +76,8 @@ def main():
               f"ncfg={len(X)} chains={len(runs)} <P>={X[:, 0].mean():.5f}")
         for ts, (v, e) in zip(list(tsig) + ["unflowed"], res):
             print(f"    tau*sigma={ts}: E_k/sqrt(sigma) = {v:.3f} +- {e:.3f}")
+        for ts, c, n, v, e in slice_ratio(runs[0][0], X=X):
+            print(f"    tau*sigma={ts}: D(r)/D(0) at r = {c} sqrt(tau) ({n} steps) = {v:.4f} +- {e:.4f}")
 
 
 if __name__ == "__main__":
