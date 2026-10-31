@@ -74,7 +74,7 @@ contains the plaquettes through y itself, so a difference of about 0.38 there is
 Read this with care. |ΔE[f]| ≤ E|f(U₁) − f(U₂)| holds for *every* coupling, so Δ(r) is a **lower bound** on
 what any coupling can achieve for this one observable. It is not the full Wasserstein or total-variation influence
 that DS needs. Still, the coupling sums at r ≥ 1 are tens to hundreds, while the true mean differences are
-around 1e-3 at r = 1 and consistent with zero (at a noise level of about 1e-4) beyond that.
+at most a few times 1e-3 at r = 1 (peaking near β_W = 1.5) and at most about 2e-4 beyond that, often consistent with zero.
 The coupling-based numbers exceed the observable lower bound by **two orders of magnitude or more**.
 The physics leaves a great deal of room. The coupling technology wastes it.
 
