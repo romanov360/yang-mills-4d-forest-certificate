@@ -29,13 +29,17 @@ import sys
 import time
 from fractions import Fraction
 
-import flint
+try:
+    import flint
+except ImportError:  # only the box and centre modes need arb; the exact finite mode does not
+    flint = None
 import numpy as np
 import sympy as sp
 
 import certify4d as cz
 
-flint.ctx.prec = 80
+if flint is not None:
+    flint.ctx.prec = 80
 T = cz.T
 PL = cz.PL
 
@@ -317,6 +321,8 @@ if __name__ == "__main__":
           f"maximum of {nl} per-link totals = {hf} (matches the stated h)", flush=True)
     if mode == "finite":
         sys.exit(0)
+    if flint is None:
+        sys.exit("modes box and centre need python-flint (pip install python-flint); mode finite does not")
     t0 = time.time()
     lo_, hi_ = (int(sys.argv[4]), int(sys.argv[5])) if len(sys.argv) > 5 else (0, len(PL))
     n, dmax = prove(mode, m, plaquettes=range(lo_, hi_))

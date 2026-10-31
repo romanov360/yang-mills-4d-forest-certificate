@@ -16,6 +16,7 @@ This is a strong-coupling result at a fixed lattice spacing. It says nothing abo
 |---|---|---|---|
 | identity field | 9 + √17 = 13.1231 | BBL; reproduced in `bloch4d.py` | exact |
 | worst field found | 13.97401 | **BBL**; reproduced independently in `climb4d.py`, `check_field.py` | floating point |
+| exact lower bound | 13.974013 | `exact_lower4d.py`: the same field rounded to exactly unitary rational matrices and the quotient evaluated in rational arithmetic | exact |
 | certificate of this form | ≈ 14.38 | **BBL** (14.3839, SDP); reproduced here (infeasible at 14.35, feasible at 14.42) | numerical |
 | **proved upper bound** | **14.420001** | **this repository** | **proved, computer-assisted** |
 | previous proved upper bound | 29/2 = 14.5 | BBL | proved |
@@ -72,7 +73,9 @@ BBL's slice ratio holds at fine lattice spacing in d = 4. It does not use or aff
 
 ## Reproduce
 
-Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint; Lean 4.19.0 for `lean/`.
+Requirements: Python 3 with numpy, scipy and sympy (`pip install -r requirements.txt`) is enough for the exact checks and the
+exact finite part, and for the lower bounds. The interval proof needs python-flint and regenerating a certificate needs cvxpy
+with Clarabel (`pip install -r requirements-full.txt`); Lean 4.19.0 for `lean/`.
 
     # finite part, exact (seconds)
     python3 cert_interval4d.py data/cert4d_h14.42.npy finite
@@ -80,6 +83,7 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
     python3 cert_interval4d.py data/cert4d_h14.42.npy centre 64 0 24     # ... 24 48, 48 72, 72 96
     # lower bounds
     python3 exact_check4d.py              # exact checks of the identities in PROOF.md (seconds)
+    python3 exact_lower4d.py              # exact rational lower bound h_F >= 13.974013 (seconds)
     lean/check.sh                         # Lean 4.19.0 kernel checks, core only, no Mathlib (about 15 min on 4 cores)
     python3 validate4d.py                 # floating-point checks that the certificate is the Wilson Hessian
     python3 bloch4d.py                    # identity field, 9 + √17
@@ -90,12 +94,20 @@ Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint
 
 ## Files
 
+- `block-su2/`: a separate result. The SU(2) plaquette-block mass gap of the four-author paper is extended from
+  β_W ≤ 0.345 to β_W ≤ 0.351 (Arb constants, Lean-checked arithmetic). See `block-su2/SHARPENED.md`.
+- `FRONTIER.md`: the status of the four open items toward the continuum, frontier sources, and ranked next steps.
 - `PROOF.md`: the analytic identification of the certificate with the Wilson Hessian in d = 4.
 - `forest4d.py`: the d = 4 period-2 forest and its period cell.
 - `certificate3d.py`: the u(2) quadratic forms, unchanged from the 3D repository (they do not depend on d).
 - `certify4d.py`: the cutting-plane SDP and the exact rational rounding.
 - `cert_interval4d.py`: the exact finite check and the interval proof.
-- `bloch4d.py`, `climb4d.py`, `check_field.py`: the lower bounds.
+- `bloch4d.py`, `climb4d.py`, `check_field.py`: the lower bounds. `exact_lower4d.py` re-evaluates the saved field's Rayleigh
+  quotient in exact rational arithmetic, from the definition (curves `exp(tX)Q` expanded to second order), and checks the
+  evaluator against `lib/fasthess.py` on random fields.
+- `review/independent_crosscheck/`: a separate re-implementation of the forest, plaquette and identity-field facts that
+  shares no code with `forest4d.py` or `bloch4d.py`.
+- `requirements.txt`, `requirements-full.txt`, `.github/workflows/exact-checks.yml`: dependencies and a CI run of the fast checks.
 - `exact_check4d.py`: exact (symbolic and combinatorial) checks of every identity in `PROOF.md`.
 - `lean/`: Lean 4 kernel proofs. `Forest4.lean` covers the forest, one fixed link per plaquette and corners on Z⁴;
   `Words4.lean` the word identities; `Cert4.lean` the finite certificate checks, run on `CertData.lean`, which

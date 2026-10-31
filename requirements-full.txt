@@ -1,0 +1,5 @@
+-r requirements.txt
+# Extras: the interval proof (python-flint) and regenerating a certificate by SDP (cvxpy with Clarabel).
+python-flint
+cvxpy
+clarabel
