@@ -70,7 +70,7 @@ liminf D_k(r')/D_k(r) > 0, which gives nontriviality of the flowed continuum lim
 ratio follows from a bound on the first-step effective energy, −log(D_k(a_k)/D_k(0))/a_k ≤ E. This is a one
 lattice-step, local-in-time condition. The proof is Jensen's inequality on the spectral measure, checked in Lean 4
 + Mathlib (`lean/mathlib/YMMathlib/SliceJensen.lean`). The note also has exact checks on the free field and on 2D
-SU(2), and a Monte Carlo measurement in 4D SU(2), which is evidence and not a proof.
+SU(2), and a Monte Carlo measurement in 4D SU(2) in d = 4 and d = 3, which is evidence and not a proof. In d = 3 the flowed E_k is flat over a factor 2.7 in the lattice spacing, while the unflowed one grows like 1/a.
 
 ## Reproduce
 

@@ -20,6 +20,8 @@ existence of the continuum limit, or a mass gap.
      (Proposition "sliceratio"). It gives the nontriviality criterion of Theorem "flowlimit"(iv);
   3. the tree bounds (T1)–(T3).
 - Large-N lattice gap: Cao–Chatterjee et al., arXiv:2510.22788. This is a lattice result, not a continuum one.
+- d = 3: T. Romanov, viXra:2610.0069 (forest gauge on Z³, SU(2) Dobrushin range β_W < 4/7,
+  9.3479 ≤ h_F ≤ 9.599991). Strong coupling only; section 5b uses d = 3 for the continuum question.
 
 This note works on input 2.
 
@@ -166,14 +168,53 @@ Reading, with caution:
   level. This is why the one-step form is the measurable one.
 
 
+## 5b. Monte Carlo: SU(2), d = 3 (evidence, not proof)
+
+Proposition S does not depend on the dimension. Its proof uses only the spectral measure of a positive
+contraction, and BBL's Propositions "sliceratio" and Theorem "flowlimit" use only reflection positivity and the
+transfer matrix. So it applies verbatim to d = 3. This is the setting of the forest-gauge paper on Z³ (Romanov,
+viXra:2610.0069). Three dimensions make a much better numerical test:
+
+- the theory is superrenormalisable;
+- the scale is set by g² directly: a g² = 4/β, and √σ/g² = 0.3353 (Teper);
+- a fixed physical box needs only L³ sites.
+
+Same observable as in d = 4: the zero-momentum spatial plaquette energy of one slice, after the spatial (here
+two-dimensional) Wilson flow. The physical box is L·a√σ ≈ 3.6. Command: `python3 analyse.py multi data/d3_*.npy`.
+
+| β | L = T | configs | a√σ | 1/(a√σ) | τσ = 0.03 | τσ = 0.06 | τσ = 0.1 | unflowed |
+|---|---|---|---|---|---|---|---|---|
+| 4.5 | 12 | 600 | 0.298 | 3.36 | 7.00(31) | 6.28(21) | 6.04(18) | 10.3(7) |
+| 6.0 | 16 | 500 | 0.224 | 4.47 | 7.39(30) | 6.21(22) | 5.66(19) | 12.8(10) |
+| 8.5 | 22 | 300 | 0.158 | 6.34 | 7.24(29) | 5.92(21) | 5.43(19) | 18.4(16) |
+| 12 | 32 | 376 (4 chains) | 0.112 | 8.95 | 7.49(13) | 6.14(10) | 5.60(11) | 28.9(22) |
+
+E_k/√σ for the zero-momentum flowed slice energy. Output: `logs/d3_summary.out`.
+
+Reading:
+
+- **Unflowed** E_k grows like 1/a: by a factor of 2.8 between β = 4.5 and 12, while 1/a grows by 2.7.
+- **Flowed** E_k is constant within about 1.5σ at each flow time over a factor 2.7 in the lattice spacing. It
+  is 7.0–7.5 at τσ = 0.03, 5.9–6.3 at 0.06 and 5.4–6.0 at 0.1. The values sit somewhat above the lightest SU(2)
+  glueball in d = 3 (m₀₊₊ ≈ 4.7√σ, Teper). They decrease as the flow time grows, as expected from the removal
+  of high-energy weight.
+- This is the behaviour Proposition S needs: E_k bounded uniformly along the tuning. Together with the
+  proposition it gives the slice ratio for this observable, as a numerical statement in d = 3.
+- The d = 4 data of section 5 are less clear because the lattices are coarser in units of the flow radius. The
+  3D result suggests that the β = 2.5 excess in d = 4 is a coarse-lattice effect, not a divergence, but only
+  finer 4D lattices can show this.
+
 ## 6. Next steps
 
-1. **Numerics at finer spacing** (β = 2.7, 2.85 at L a√σ ≈ 3, i.e. L = 32–48). This is where a GPU helps: a JAX
+1. **d = 3 first.** Push β to 16–24 (L = 40–64), take the box dependence, and use two observables (plaquette
+   energy and Polyakov-type spatial loops). This is cheap. A proof of (S) is probably also more accessible here,
+   because the theory is superrenormalisable.
+2. **Numerics at finer spacing in d = 4** (β = 2.7, 2.85 at L a√σ ≈ 3, i.e. L = 32–48). This is where a GPU helps: a JAX
    or PyTorch port of `su2_slice.py` on one A100/H100 should run 50–100× faster than these 4 CPU cores. Modal is
    a good fit for that. Measure E_k for two flow times, and its dependence on the box.
-2. **Measure both sides of the f-sum rule.** Use the adjoint (backpropagated) flow to compute Σ_e|∇_e U|². This
+3. **Measure both sides of the f-sum rule.** Use the adjoint (backpropagated) flow to compute Σ_e|∇_e U|². This
    separates (S-a) from (S-b) numerically.
-3. **Prove (S-a) on small fields.** Use the flow linearisation bounds already in BBL ("torusscales",
+4. **Prove (S-a) on small fields.** Use the flow linearisation bounds already in BBL ("torusscales",
    "smallscales"), plus the SU(2) plaquette bounds that are uniform in the coupling, to control large fields.
-4. **Lean.** Restate Proposition S for the spectral measure of a positive contraction on a Hilbert space. This
+5. **Lean.** Restate Proposition S for the spectral measure of a positive contraction on a Hilbert space. This
    needs Mathlib's spectral theory for self-adjoint operators, which is partly available.

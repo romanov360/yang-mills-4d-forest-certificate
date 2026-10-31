@@ -100,9 +100,10 @@ def random_dir(n, rng):
 
 
 def heatbath(U, beta, rng, masks):
-    for mu in range(4):
+    d = U.shape[0]
+    for mu in range(d):
         for m in masks:
-            S = staple_sum(U, mu, range(4))[m]           # (n, 4)
+            S = staple_sum(U, mu, range(d))[m]           # (n, 4)
             k = np.sqrt(np.sum(S * S, axis=-1))
             V = S / k[:, None]                            # U V has density exp(beta k x0)
             x0 = kp_sample(beta * k, rng)
@@ -112,9 +113,10 @@ def heatbath(U, beta, rng, masks):
 
 
 def overrelax(U, masks):
-    for mu in range(4):
+    d = U.shape[0]
+    for mu in range(d):
         for m in masks:
-            S = staple_sum(U, mu, range(4))[m]
+            S = staple_sum(U, mu, range(d))[m]
             V = renorm(S)
             Vd = qdag(V)
             U[mu][m] = qmul(qmul(Vd, qdag(U[mu][m])), Vd)
@@ -127,8 +129,9 @@ def flow_force(U):
     exp(eps Z) U increases Re Tr(U Sigma) to first order (verified: the energy decreases)."""
     Z = np.empty(U.shape[:-1] + (3,))
     Z[0] = 0.0
-    for i in (1, 2, 3):
-        W = qmul(U[i], staple_sum(U, i, (1, 2, 3)))
+    sp = range(1, U.shape[0])
+    for i in sp:
+        W = qmul(U[i], staple_sum(U, i, sp))
         Z[i] = -W[..., 1:]
     return Z
 
@@ -153,20 +156,21 @@ def spatial_flow(U, tau, eps):
 def slice_energy(V):
     """Phi_t = sum_x sum_{i<j} (1 - Re tr U_ij / 2), one number per time slice."""
     E = np.zeros(V.shape[1])
-    for i in (1, 2, 3):
-        for j in range(i + 1, 4):
+    d = V.shape[0]
+    for i in range(1, d):
+        for j in range(i + 1, d):
             P = qmul(qmul(V[i], shift(V[j], i, 1)), qmul(qdag(shift(V[i], j, 1)), qdag(V[j])))
-            E += (1 - P[..., 0]).sum(axis=(1, 2, 3))
+            E += (1 - P[..., 0]).sum(axis=tuple(range(1, d)))
     return E
 
 
 def plaquette(U):
-    tot = 0.0
-    for mu in range(4):
-        for nu in range(mu + 1, 4):
+    tot, d = 0.0, U.shape[0]
+    for mu in range(d):
+        for nu in range(mu + 1, d):
             P = qmul(qmul(U[mu], shift(U[nu], mu, 1)), qmul(qdag(shift(U[mu], nu, 1)), qdag(U[nu])))
             tot += P[..., 0].mean()
-    return tot / 6
+    return tot / (d * (d - 1) // 2)
 
 
 def flow_checkpoints(U, taus, eps):
@@ -180,18 +184,19 @@ def flow_checkpoints(U, taus, eps):
 
 
 def main_multi():
-    """Usage: su2_slice.py multi BETA L T NTHERM NMEAS SEP SEED OUT TAU_SIGMA1,TAU_SIGMA2,..."""
+    """Usage: su2_slice.py multi BETA L T NTHERM NMEAS SEP SEED OUT TAU_SIGMA1,TAU_SIGMA2,... [D]"""
     beta, L, T, ntherm, nmeas, sep, seed, out = (
         float(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]),
         int(sys.argv[6]), int(sys.argv[7]), int(sys.argv[8]), sys.argv[9])
     tsig = [float(x) for x in sys.argv[10].split(",")]
-    asig = A_SQRT_SIGMA[beta]
+    d = int(sys.argv[11]) if len(sys.argv) > 11 else 4
+    asig = a_sqrt_sigma(beta, d)
     taus = [ts / asig ** 2 for ts in tsig]
     rng = np.random.default_rng(seed)
-    shape = (T, L, L, L)
+    shape = (T,) + (L,) * (d - 1)
     m = parity_mask(shape)
     masks = (m, ~m)
-    U = np.zeros((4,) + shape + (4,))
+    U = np.zeros((d,) + shape + (4,))
     U[..., 0] = 1.0
     t0 = time.time()
     for it in range(ntherm):
@@ -199,7 +204,7 @@ def main_multi():
         for _ in range(3):
             overrelax(U, masks)
         U = renorm(U)
-    print(f"beta={beta} L={L} T={T} tau*sigma={tsig} tau/a^2={[round(t, 3) for t in taus]} "
+    print(f"d={d} beta={beta} L={L} T={T} a*sqrt(sigma)={asig:.4f} tau*sigma={tsig} tau/a^2={[round(t, 3) for t in taus]} "
           f"therm {time.time() - t0:.0f}s", flush=True)
     rows = []
     for it in range(nmeas):
@@ -208,7 +213,7 @@ def main_multi():
             for _ in range(3):
                 overrelax(U, masks)
         U = renorm(U)
-        rows.append(np.concatenate([[plaquette(U)], slice_energy(U)] + flow_checkpoints(U, taus, 0.04)))
+        rows.append(np.concatenate([[plaquette(U)], slice_energy(U)] + flow_checkpoints(U, taus, 0.05)))
         if it % 10 == 0:
             print(f"  meas {it} t={time.time() - t0:.0f}s", flush=True)
         np.save(out, np.array(rows))
@@ -252,6 +257,13 @@ def main():
 # a sqrt(sigma) for the SU(2) Wilson action (Fingberg-Heller-Karsch 1993;
 # Lucini-Teper-Wenger 2004).  Only ratios along the tuning matter here.
 A_SQRT_SIGMA = {2.3: 0.3690, 2.4: 0.2660, 2.5: 0.1881, 2.6: 0.1326, 2.7: 0.0911}
+
+# d = 3: beta = 4/(a g^2) and sqrt(sigma)/g^2 = 0.3353 (Teper 1998), up to O(a) corrections.
+SQRT_SIGMA_OVER_G2_3D = 0.3353
+
+
+def a_sqrt_sigma(beta, d):
+    return A_SQRT_SIGMA[beta] if d == 4 else 4.0 / beta * SQRT_SIGMA_OVER_G2_3D
 
 if __name__ == "__main__":
     main_multi() if sys.argv[1] == "multi" else main()

@@ -11,7 +11,7 @@ Usage: python3 analyse.py data/*.npy
 """
 import sys
 import numpy as np
-from su2_slice import A_SQRT_SIGMA
+from su2_slice import A_SQRT_SIGMA, a_sqrt_sigma
 
 
 def gamma(E, nmax):
@@ -57,19 +57,27 @@ def main():
 
 
 
-def multi(paths, tsig=(0.045, 0.1, 0.2)):
-    """E_k/sqrt(sigma) at several flow times, for runs made with `su2_slice.py multi`."""
-    print(f"{'beta':>5} {'ncfg':>5} {'a*sqrt(s)':>9} " + " ".join(f"{'tau*s=%g' % t:>14}" for t in tsig)
-          + f" {'unflowed':>14}")
-    for path in paths:
-        X = np.load(path)
+def multi(paths):
+    """E_k/sqrt(sigma) at several flow times, for runs made with `su2_slice.py multi` (d = 4 or d3_* files)."""
+    header, runs = None, {}
+    for path in paths:                         # independent chains at one (d, beta) are pooled
         beta = float(path.split("_b")[-1].split("_")[0])
+        d = 3 if "d3_" in path.split("/")[-1] else 4
+        runs.setdefault((d, beta), []).append(np.load(path))
+    for (d, beta) in sorted(runs, key=lambda k: (-k[0], k[1])):
+        X = np.concatenate(runs[(d, beta)])
+        tsig = (0.03, 0.06, 0.1) if d == 3 else (0.045, 0.1, 0.2)
+        if header != d:
+            header = d
+            print(f"d={d}\n{'beta':>5} {'ncfg':>5} {'a*sqrt(s)':>9} {'1/(a sqrt s)':>12} "
+                  + " ".join(f"{'tau*s=%g' % t:>14}" for t in tsig) + f" {'unflowed':>14}")
         T = (X.shape[1] - 1) // (len(tsig) + 1)
-        asig = A_SQRT_SIGMA[beta]
+        asig = a_sqrt_sigma(beta, d)
         lg = lambda E: -np.log(gamma(E, 1)[1] / gamma(E, 1)[0])
         cols = [X[:, 1 + T * (j + 1):1 + T * (j + 2)] for j in range(len(tsig))] + [X[:, 1:1 + T]]
         res = [jackknife(E, lg, min(20, len(X))) for E in cols]
-        print(f"{beta:5.2f} {len(X):5d} {asig:9.4f} " + " ".join(f"{v / asig:7.3f}({e / asig:.3f})" for v, e in res))
+        print(f"{beta:5.2f} {len(X):5d} {asig:9.4f} {1 / asig:12.2f} "
+              + " ".join(f"{v / asig:7.3f}({e / asig:.3f})" for v, e in res))
 
 
 if __name__ == "__main__":
