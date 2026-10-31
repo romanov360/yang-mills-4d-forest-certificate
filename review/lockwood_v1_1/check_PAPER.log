@@ -1,0 +1,4 @@
+(1) h = 29/2 = 14.5  [weights 21/10, 5/4, 9/10]
+(2) diagonal part: minimal exact LDL pivot over 4 positions x (W = +1, -1) = 21/530 > 0
+(3) pair part: 5722 stored intervals tile [0, 2 pi] exactly for all 4 positions and all pass (1s)
+CERTIFICATE VALID: h_F <= 29/2
