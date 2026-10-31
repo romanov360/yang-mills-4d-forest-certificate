@@ -29,7 +29,8 @@ The CPU runs found the following.
 - **d = 4:** only β = 2.3–2.5 was reachable, with a√σ = 0.37–0.19, and there the flow radius is barely a lattice
   spacing. The result is inconclusive: E_k/√σ = 4.4(3), 4.6(2), 5.9(3).
 
-These runs decide the d = 4 case at a√σ ≈ 0.13, 0.09 and 0.06.
+These runs extend the d = 4 measurement to a√σ ≈ 0.13, 0.09 and 0.06. What that can and cannot settle is in
+[Reading the result](#reading-the-result).
 
 ## Algorithm
 
@@ -161,3 +162,18 @@ Proposition S needs E_k/√σ (flowed) to level off as a → 0, as it does in d 
 growing like 1/a, which shows the observable can detect a divergence. If the flowed E_k keeps growing at
 β = 2.7–2.85 for every flow time, the one-step route to the slice ratio fails in d = 4 for this observable.
 The slice ratio itself could still hold, because Proposition S is only sufficient.
+
+**Statistical power.** A power-law divergence is easy to see, and the existing CPU data already disfavour one.
+E_k ∝ 1/a from β = 2.3 would predict 8.6√σ at β = 2.5; the measurement is 5.87(33). What the runs must
+distinguish is "bounded" from "slowly growing", say E_k ≈ c + b·ln(1/a). Some numbers:
+
+- The CPU data have short autocorrelation times (τ_int ≈ 0.5–1 measurement) and error bars stable under
+  rebinning.
+- Errors of about 0.25–0.3 per point are therefore realistic at 300–500 configurations.
+- Over a√σ = 0.19 → 0.064 that gives σ_b ≈ 0.38. Only a growth of b ≳ 0.75√σ per e-fold in a, about 15% of E_k
+  per e-fold, would show at 2σ.
+- A milder logarithm would look flat.
+- The $5 first stage (to a√σ = 0.09, fewer configurations) has σ_b ≈ 0.76.
+
+So the runs can rule out a fast divergence and give a stronger "flat" result than the CPU data. They cannot prove
+boundedness, and a slow logarithmic growth would need a perturbative argument, not more Monte Carlo.
