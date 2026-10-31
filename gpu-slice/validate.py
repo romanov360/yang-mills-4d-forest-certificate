@@ -5,6 +5,7 @@ Run before any long GPU job, on the machine that will run it:
     python3 validate.py            # quick checks (a minute on a CPU, seconds on a GPU)
     python3 validate.py --physics  # also a short beta = 2.3 run, compared with the CPU table
     python3 validate.py --bench 32 # time one sweep and one flow step on a 32^4 lattice (cost estimates)
+    python3 validate.py --quick    # smaller samples, for a smoke test
 
 Checks:
   1. Kennedy-Pendleton sampler: <x0> = I_2(alpha)/I_1(alpha) for the density sqrt(1-x0^2) exp(alpha x0).
@@ -38,6 +39,7 @@ def main():
     p.add_argument("--physics", action="store_true")
     p.add_argument("--bench", type=int, default=0)
     p.add_argument("--x64", action="store_true", help="run the statistical checks in double precision")
+    p.add_argument("--quick", action="store_true", help="smaller samples (a smoke test, looser statistics)")
     a = p.parse_args()
 
     K = SJ.build(4, True)                      # the exact comparisons use double precision
@@ -46,7 +48,7 @@ def main():
 
     # 1. Kennedy-Pendleton mean
     for alpha in (0.5, 4.0, 30.0):
-        x = np.asarray(K["kp_sample"](jax.random.key(1), jnp.full((400000,), alpha)))
+        x = np.asarray(K["kp_sample"](jax.random.key(1), jnp.full((100000 if a.quick else 400000,), alpha)))
         exact = ive(2, alpha) / ive(1, alpha)
         err = x.std() / np.sqrt(len(x))
         report(f"KP sampler alpha={alpha}", abs(x.mean() - exact) < 5 * err,
@@ -75,20 +77,21 @@ def main():
 
     # 4. plaquette
     Ks = SJ.build(4, a.x64)
-    shape = (8, 8, 8, 8)
-    m = Ks["parity"](shape)
+    shape = (6, 6, 6, 6) if a.quick else (8, 8, 8, 8)
+    nsw = 80 if a.quick else 150
+    masks = Ks["parity_masks"](shape)
     for beta, lit in ((2.3, 0.6024), (2.5, 0.6517)):
         U = Ks["jnp"].zeros((4,) + shape + (4,), dtype=Ks["jnp"].float64 if a.x64 else Ks["jnp"].float32).at[..., 0].set(1)
         key = Ks["jax"].random.key(7)
         ps = []
-        for it in range(150):
-            U, key = Ks["sweep"](U, key, beta, (m, ~m), 3)
-            if it >= 50:
+        for it in range(nsw):
+            U, key = Ks["sweep"](U, key, beta, masks, 3)
+            if it >= nsw // 3:
                 ps.append(float(Ks["plaquette"](U)))
         ps = np.array(ps)
-        blk = ps.reshape(10, -1).mean(axis=1)
+        blk = np.array([b.mean() for b in np.array_split(ps, 10)])
         err = blk.std(ddof=1) / np.sqrt(len(blk))
-        report(f"plaquette beta={beta}", abs(ps.mean() - lit) < max(5 * err, 1e-3),
+        report(f"plaquette beta={beta}", abs(ps.mean() - lit) < max(5 * err, 3e-3 if a.quick else 1e-3),
                f"{ps.mean():.5f} +- {err:.5f}, literature {lit}")
 
     # 5. a short physics run
@@ -110,17 +113,17 @@ def main():
         Kb = SJ.build(4, a.x64)
         jb = Kb["jnp"]
         shape = (L,) * 4
-        m = Kb["parity"](shape)
+        masks = Kb["parity_masks"](shape)
         U = jb.zeros((4,) + shape + (4,), dtype=jb.float64 if a.x64 else jb.float32).at[..., 0].set(1)
         key = Kb["jax"].random.key(0)
-        U, key = Kb["sweep"](U, key, 2.7, (m, ~m), 3)
+        U, key = Kb["sweep"](U, key, 2.7, masks, 3)
         U.block_until_ready()
         t = time.time()
         for _ in range(3):
-            U, key = Kb["sweep"](U, key, 2.7, (m, ~m), 3)
+            U, key = Kb["sweep"](U, key, 2.7, masks, 3)
         U.block_until_ready()
         ts = (time.time() - t) / 3
-        V = Kb["flow"](U, 0.04, 2)
+        V = Kb["flow"](U, 0.04, 20)            # compile (the step count is a static argument)
         V.block_until_ready()
         t = time.time()
         V = Kb["flow"](U, 0.04, 20)

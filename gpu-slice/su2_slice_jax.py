@@ -101,21 +101,35 @@ def build(d, x64):
         return (sum(jnp.indices(shape)) % 2) == 0
 
     def sweep(U, key, beta, masks, nor):
+        """One heat-bath sweep and nor overrelaxation sweeps.  masks: (2,) + lattice, the two parities.
+
+        The parity and overrelaxation loops are lax.fori_loops, so the compiled program holds one copy of
+        each update per direction (compilation time matters on GPUs)."""
         alld = range(d)
         for mu in range(d):
-            for m in masks:
+            def hb(par, carry, mu=mu):
+                U, key = carry
                 key, k1, k2 = jax.random.split(key, 3)
                 S = staple_sum(U, mu, alld)
                 k = jnp.sqrt(jnp.sum(S * S, axis=-1))
                 V = S / k[..., None]
                 X = random_su2_with_x0(k2, kp_sample(k1, beta * k))
-                U = U.at[mu].set(jnp.where(m[..., None], qmul(X, qdag(V)), U[mu]))
-        for _ in range(nor):
+                return U.at[mu].set(jnp.where(masks[par][..., None], qmul(X, qdag(V)), U[mu])), key
+            U, key = lax.fori_loop(0, 2, hb, (U, key))
+
+        def over(_, U):
             for mu in range(d):
-                for m in masks:
+                def orx(par, U, mu=mu):
                     Vd = qdag(renorm(staple_sum(U, mu, alld)))
-                    U = U.at[mu].set(jnp.where(m[..., None], qmul(qmul(Vd, qdag(U[mu])), Vd), U[mu]))
+                    return U.at[mu].set(jnp.where(masks[par][..., None], qmul(qmul(Vd, qdag(U[mu])), Vd), U[mu]))
+                U = lax.fori_loop(0, 2, orx, U)
+            return U
+        U = lax.fori_loop(0, nor, over, U)
         return renorm(U), key
+
+    def parity_masks(shape):
+        m = parity(shape)
+        return jnp.stack([m, ~m])
 
     sp = tuple(range(1, d))
 
@@ -157,21 +171,27 @@ def build(d, x64):
                 tot = tot + P[..., 0].mean()
         return tot / (d * (d - 1) // 2)
 
-    def measure(U, segments):
-        """segments: tuple of (eps, nsteps) taking the flow from one checkpoint to the next."""
-        out = [jnp.atleast_1d(plaquette(U)), slice_energy(U)]
+    def measure_host(U, segments):
+        """Plaquette, then the slice energies unflowed and at each flow time.
+
+        segments: (eps, nsteps) per flow interval.  The flow kernel takes eps and nsteps as runtime arguments,
+        so it is compiled once for all intervals and all runs on this lattice shape."""
+        out = [jnp.atleast_1d(plaquette_j(U)), slice_energy_j(U)]
         V = U
         for eps, n in segments:
-            V = flow(V, eps, n) if n > 0 else V
-            out.append(slice_energy(V))
+            if n > 0:
+                V = flow_j(V, eps, n)
+            out.append(slice_energy_j(V))
         return jnp.concatenate(out)
 
+    flow_j = jax.jit(flow)
+    slice_energy_j = jax.jit(slice_energy)
+    plaquette_j = jax.jit(plaquette)
+
     return dict(
-        jax=jax, jnp=jnp, parity=parity,
+        jax=jax, jnp=jnp, parity=parity, parity_masks=parity_masks,
         sweep=jax.jit(sweep, static_argnums=(4,)),
-        measure=jax.jit(measure, static_argnums=(1,)),
-        flow=jax.jit(flow, static_argnums=(2,)),
-        slice_energy=jax.jit(slice_energy), plaquette=jax.jit(plaquette),
+        measure=measure_host, flow=flow_j, slice_energy=slice_energy_j, plaquette=plaquette_j,
         qmul=qmul, qdag=qdag, renorm=renorm, kp_sample=kp_sample, staple_sum=staple_sum,
     )
 
@@ -204,8 +224,7 @@ def run(args, on_checkpoint=None):
     taus = [ts / asig ** 2 for ts in tsig]
     segs = flow_segments(taus, args.eps)
     shape = (args.T,) + (args.L,) * (args.d - 1)
-    m = K["parity"](shape)
-    masks = (m, ~m)
+    masks = K["parity_masks"](shape)
     meta = dict(beta=args.beta, d=args.d, L=args.L, T=args.T, sep=args.sep, nor=args.nor, seed=args.seed,
                 tau_sigma=tsig, tau_lattice=taus, a_sqrt_sigma=asig, eps_max=args.eps, x64=args.x64,
                 columns="plaquette, Phi_t unflowed (T), then Phi_t at each tau_sigma (T each)")

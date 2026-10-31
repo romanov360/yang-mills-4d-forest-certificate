@@ -1,7 +1,13 @@
 # GPU runs: the one-step slice bound in 4D SU(2) lattice gauge theory
 
-This folder is a self-contained JAX port of a Monte Carlo study, with a launcher for Modal GPUs. The
-launcher has **not been run on Modal yet**. Every check below was run on a CPU.
+This folder is a self-contained JAX port of a Monte Carlo study, with a launcher for Modal GPUs. The code has
+been checked on a CPU in full, and on a Modal T4 GPU up to the end of the correctness checks (see
+[Validation](#validation)). The production runs have not been made: they are the job for whoever runs this.
+
+**For the person running it:** run `modal run modal_app.py::smoke` first (a few cents), then
+`modal run modal_app.py::validate --gpu H100` (the benchmark sets the real cost), then
+`modal run --detach modal_app.py::production`. Send back the `out/` folder from `modal volume get` (the
+`.npy` and `.json` files; the checkpoints are not needed) and the output of `python3 analyse_jax.py out/*.npy`.
 
 ## What it is for
 
@@ -61,7 +67,9 @@ Python, JAX (`jax[cuda12]==0.11.2`), NumPy, SciPy and, for the launcher, `modal=
 | `reference/su2_slice.py` | the NumPy original, used by `validate.py` |
 | `requirements.txt` | pinned versions |
 
-## Validation (CPU, this repository; rerun on the GPU)
+## Validation
+
+On a CPU (4 cores):
 
     python3 validate.py --physics --bench 16
 
@@ -73,7 +81,24 @@ Python, JAX (`jax[cuda12]==0.11.2`), NumPy, SciPy and, for the launcher, `modal=
 | plaquette, 8⁴, float32: β = 2.3 / 2.5 | 0.60159(65) / 0.65250(45); literature 0.6024 / 0.6517 |
 | E_k/√σ at β = 2.3, 8⁴, τσ = 0.045, 300 configurations | 4.03(26); CPU NumPy runs gave 4.41(26) and 3.87(17) |
 | checkpoint and resume | a 12-measurement run resumed to 20 measurements |
-| CPU timing, 16⁴ | 0.25 s per sweep, 0.15 s per RK3 flow step (NumPy: about 1.5 s per sweep) |
+| CPU timing, 16⁴ | 0.25 s per sweep, 0.033 s per RK3 flow step (NumPy: about 1.5 s per sweep) |
+| CPU compile time, 16⁴ | 4.4 s for the sweep, about 3 s for the flow kernel |
+
+On a Modal T4 (31 October 2026, `smoke` with an earlier version of the code):
+
+- JAX found the GPU (`CudaDevice(id=0)`).
+- Every correctness check passed: the Kennedy–Pendleton means; flow vs the NumPy reference, 7.8·10⁻¹⁶ in double
+  precision on the GPU; gauge covariance, 1.2·10⁻¹⁴; and the plaquettes, 0.60088(105) at β = 2.3 and
+  0.65288(63) at β = 2.5.
+- The 200 s budget ran out in the benchmark that followed. Nearly all of the time went to XLA compilation, which
+  runs on the host CPU and is slow for GPU targets. Modal's default CPU share made it worse.
+- Since that test:
+  - the parity and overrelaxation loops are `lax.fori_loop`s, which halves the compiled program;
+  - the flow kernel is compiled once, with the step count as a runtime argument;
+  - the Modal functions get 4 CPU cores;
+  - JAX's persistent compilation cache lives on the volume.
+- These changes were checked on a CPU (all checks pass, same runtime). They have not been rerun on the GPU.
+- The two test runs cost $0.108 in total.
 
 ## Running
 
@@ -86,7 +111,8 @@ Locally (CPU or one GPU):
 
 On Modal:
 
-    pip install modal==1.6.3 && modal setup
+    pip install "modal[api-proxy-support]==1.6.3" && modal setup
+    modal run modal_app.py::smoke                       # T4, at most 7 min: GPU found, checks, tiny run with resume
     modal run modal_app.py::validate                    # L4, a few minutes: checks + 32^4 benchmark
     modal run modal_app.py::validate --gpu H100         # benchmark on the production GPU
     modal run --detach modal_app.py::production         # the plan below, in parallel
@@ -107,14 +133,24 @@ three flow times.
 \* At β = 2.85, a√σ = 0.064 is a two-loop extrapolation from β = 2.7. Measure it (string tension, or the flow
 scale t₀) before quoting physical units.
 
-**Cost.** The GPU speed is not measured yet; the validate entrypoint measures it. If an H100 runs this about
-100× faster than the CPU timing above, the plan takes roughly:
+**Cost.** The GPU speed is not measured yet; `validate --gpu H100` measures it (time per sweep and per flow step
+at 32⁴). The flow dominates. Scaling the CPU timing above by volume:
 
-- β = 2.5 and 2.6: about 1 h;
-- β = 2.7: about 2 × 1.5 h;
-- β = 2.85: about 2 × 8 h.
+| β | flow step on CPU | flow per configuration on CPU |
+|---|---|---|
+| 2.7 (32⁴) | about 0.5 s | about 5 min (604 steps) |
+| 2.85 (48⁴) | about 2.7 s | about 55 min (1222 steps) |
 
-That is 20–25 GPU-hours, about $80–100 at Modal's ~$3.95/h for an H100. Two ways to cut it:
+A GPU speed-up of 30–100× over these 4 CPU cores gives roughly:
+
+| β | per configuration | per chain |
+|---|---|---|
+| 2.7 | 3–10 s | 15–50 min |
+| 2.85 | 35–110 s | 2–6 h |
+
+Including β = 2.5–2.6 and compilation, the whole plan is about 5–15 H100-hours, $20–60 at about $3.95/h. Read
+the benchmark before launching, and multiply its time per flow step by the step counts in the table above. Two
+ways to cut the cost:
 
 - drop τσ = 0.2 at β = 2.85 (the flow steps halve), or raise `--eps` after checking the step-size dependence;
 - run β = 2.85 last, and only if β = 2.6–2.7 leave the question open.
