@@ -63,15 +63,6 @@ Mathlib.
 `PROOF.md` gives the written proof that these checks bound the Wilson Hessian: the plaquette rewriting, the site
 identity with 8 ends per site, the lemma, and the reduction from U(N) to U(2) phases.
 
-## Continuum side: the slice ratio from a one-step bound
-
-`continuum/SLICE.md` is a separate note on BBL's continuum step. One of BBL's open inputs is the slice ratio
-liminf D_k(r')/D_k(r) > 0, which gives nontriviality of the flowed continuum limit. The note shows that the slice
-ratio follows from a bound on the first-step effective energy, −log(D_k(a_k)/D_k(0))/a_k ≤ E. This is a one
-lattice-step, local-in-time condition. The proof is Jensen's inequality on the spectral measure, checked in Lean 4
-+ Mathlib (`lean/mathlib/YMMathlib/SliceJensen.lean`). The note also has exact checks on the free field and on 2D
-SU(2), and a Monte Carlo measurement in SU(2) in d = 4 and d = 3, which is evidence and not a proof. In d = 3 the flowed E_k is flat over a factor 2.7 in the lattice spacing, while the unflowed one grows like 1/a.
-
 ## Reproduce
 
 Requirements: Python 3, numpy, scipy, sympy, cvxpy (with Clarabel), python-flint; Lean 4.19.0 for `lean/`.

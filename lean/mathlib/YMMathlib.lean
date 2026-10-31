@@ -1,1 +1,0 @@
-import YMMathlib.SliceJensen
