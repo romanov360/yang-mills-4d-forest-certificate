@@ -1,0 +1,6 @@
+# Fast path: the exact checks and the exact finite part of the certificate (seconds).
+#   python3 exact_check4d.py
+#   python3 cert_interval4d.py data/cert4d_h14.42.npy finite
+numpy
+scipy
+sympy

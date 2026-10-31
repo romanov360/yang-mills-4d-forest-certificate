@@ -12,7 +12,6 @@ resulting weights are then checked on a much finer grid (and later proved exactl
 import itertools
 import sys
 
-import cvxpy as cp
 import numpy as np
 
 s = [np.array([[0, 1], [1, 0]], complex), np.array([[0, -1j], [1j, 0]]), np.array([[1, 0], [0, -1]], complex)]
@@ -65,6 +64,7 @@ CLASSES = {"1A,1A,1O,2o": ("A", "A", "O", "C"), "1A,1A,1O,2a": ("A", "A", "O", "
 
 
 def solve(m=12, t_fixed=None):
+    import cvxpy as cp  # needed only for the SDP; the exact checks run without it
     W = grid(m)
     F = [qmat(fp, w) for w in W]
     C = [qmat(cpf, w) for w in W]

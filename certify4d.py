@@ -11,7 +11,6 @@ Usage: python3 certify4d.py search h0          (cutting-plane SDP, prints the be
 import sys
 from fractions import Fraction
 
-import cvxpy as cp
 import numpy as np
 
 import certificate3d as c
@@ -89,6 +88,7 @@ def link_totals(G, A, add=lambda u, v: u + v, zero=0):
 
 
 def search(h0, pts, gmargin=1e-4, sym=None):
+    import cvxpy as cp  # needed only for the SDP; the exact checks run without it
     G = {y: cp.Variable((2 * d, 2 * d), symmetric=True) for y in T.sites}
     eps = cp.Variable()
     cons = []
