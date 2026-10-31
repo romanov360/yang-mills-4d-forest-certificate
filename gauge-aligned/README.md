@@ -67,7 +67,8 @@ contains the plaquettes through y itself, so a difference of about 0.38 there is
 | 0.30 | 1.3e-04 ± 2e-04 | 2.2e-05 ± 1e-04 | 1.2e-04 ± 1e-04 | 6.3e-05 ± 5e-05 |
 | 0.50 | 2.2e-04 ± 2e-04 | 4.1e-05 ± 1e-04 | 2.2e-06 ± 1e-04 | 5.3e-05 ± 5e-05 |
 | 1.00 | 1.1e-03 ± 2e-04 | 4.5e-05 ± 9e-05 | 2.4e-04 ± 9e-05 | 2.7e-05 ± 4e-05 |
-| 1.5, 2.0, 2.5 | (running; will be added) | | | |
+| 1.50 | 3.6e-03 ± 2e-04 | 2.0e-04 ± 8e-05 | 3.2e-06 ± 7e-05 | 4.5e-05 ± 3e-05 |
+| 2.0, 2.5 | (running; will be added) | | | |
 
 Read this with care. |ΔE[f]| ≤ E|f(U₁) − f(U₂)| holds for *every* coupling, so Δ(r) is a **lower bound** on
 what any coupling can achieve for this one observable. It is not the full Wasserstein or total-variation influence
