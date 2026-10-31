@@ -56,10 +56,13 @@ def build(d, x64):
         return q / jnp.sqrt(jnp.sum(q * q, axis=-1, keepdims=True))
 
     def qexp_vec(w):
-        n = jnp.sqrt(jnp.sum(w * w, axis=-1))
-        safe = jnp.where(n > 1e-30, n, 1.0)
-        s = jnp.where(n > 1e-30, jnp.sin(n) / safe, 1.0)
-        return jnp.concatenate([jnp.cos(n)[..., None], w * s[..., None]], axis=-1)
+        """exp(i w.sigma); differentiable at w = 0 (series branch there), so jax.grad works through the flow."""
+        n2 = jnp.sum(w * w, axis=-1)
+        small = n2 < 1e-12
+        n = jnp.sqrt(jnp.where(small, 1.0, n2))
+        s = jnp.where(small, 1.0 - n2 / 6, jnp.sin(n) / n)
+        c = jnp.where(small, 1.0 - n2 / 2, jnp.cos(n))
+        return jnp.concatenate([c[..., None], w * s[..., None]], axis=-1)
 
     def shift(a, mu, s):
         return jnp.roll(a, -s, axis=mu)
@@ -193,6 +196,7 @@ def build(d, x64):
         sweep=jax.jit(sweep, static_argnums=(4,)),
         measure=measure_host, flow=flow_j, slice_energy=slice_energy_j, plaquette=plaquette_j,
         qmul=qmul, qdag=qdag, renorm=renorm, kp_sample=kp_sample, staple_sum=staple_sum,
+        qexp_vec=qexp_vec, rk3_step=rk3_step, slice_energy_raw=slice_energy,
     )
 
 

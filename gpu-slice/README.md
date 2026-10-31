@@ -163,6 +163,22 @@ growing like 1/a, which shows the observable can detect a divergence. If the flo
 β = 2.7–2.85 for every flow time, the one-step route to the slice ratio fails in d = 4 for this observable.
 The slice ratio itself could still hold, because Proposition S is only sufficient.
 
+**What "bounded" should look like.** For free gluons (leading-order perturbation theory, script `pert_slice.py`
+in big-bang-monotile/yang-mills-continuum), E_k on these exact lattices is finite and approaches its continuum
+value from below:
+
+| β | 2.3 | 2.4 | 2.5 | 2.6 | 2.7 | continuum |
+|---|---|---|---|---|---|---|
+| τσ = 0.045 | 6.12 | 6.28 | 6.54 | 6.70 | 6.87 | 7.09 |
+| τσ = 0.1 | 4.73 | 4.73 | 4.94 | 4.91 | 5.13 | 4.76 |
+
+At τσ = 0.1 and 0.2 the lattice values sit above the continuum because of the finite box (≈ 3/√σ). The CPU Monte
+Carlo values at τσ = 0.045 (4.4, 4.6, 5.9 at β = 2.3–2.5) lie below these and rise towards them.
+
+- **Bounded** shows up as a plateau near or below the leading-order values, with the mass gap pushing the large-τ
+  values up a little.
+- **A real divergence** shows up as E_k overtaking the leading-order values and continuing to climb.
+
 **Statistical power.** A power-law divergence is easy to see, and the existing CPU data already disfavour one.
 E_k ∝ 1/a from β = 2.3 would predict 8.6√σ at β = 2.5; the measurement is 5.87(33). What the runs must
 distinguish is "bounded" from "slowly growing", say E_k ≈ c + b·ln(1/a). Some numbers:
