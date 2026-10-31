@@ -51,3 +51,16 @@ The plan, modelled on Prop. prop:2d:
    traces), so that the cover of the boundary data is low-dimensional.
 4. First target: GDS(V, ε) for SU(2), d = 4, on the L = 2 or 3 box at β_W = 0.3, where the answer is known. Then
    push past 0.345.
+
+## Update: scoping done (box/GDS4D_SCOPING.md)
+
+Two results:
+
+- **d = 2: certified explicit boxes.** `box/gds2d_certified.py` evaluates BBL's Prop. 2d coupling in ball
+  arithmetic. The smallest certified squares are L = 10, 26, 36, 55, 85, 139, 209 at β_W = 0.5, 1, 2, 3, 4, 6, 8,
+  against 32–512 from their existence choice.
+- **d = 4: the plan above does not scale.** The exact counting in `box/gds4d_counting.py` shows that
+  n_min/|∂V_ν| grows only like L/8. A neighbourhood coupling therefore needs boxes of 10⁴–10⁹ links, with a
+  uniform η of 10⁻⁵–10⁻¹¹. That is not a finite computation; a new coupling idea is needed. See the scoping
+  note.
+

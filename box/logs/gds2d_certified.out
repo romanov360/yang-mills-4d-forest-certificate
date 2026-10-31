@@ -1,0 +1,10 @@
+2D SU(2) Wilson action, weight exp(beta_W cos theta).  Smallest L x L square certified by the
+disk-integration coupling of BBL Prop. 2d (sub-square s x s), in ball arithmetic.
+ beta_W  L (TV <= eps)    s         eta    L (BBL 2e/(1-e^2))    s    BBL existence L = 8 s^2
+    0.5             10    2   9.372e-04                    10    2                         32
+    1.0             26    3   1.064e-05                    26    3                         72
+    2.0             36    3   2.146e-03                    50    4                        128
+    3.0             55    4   4.685e-04                    65    4                        200
+    4.0             85    5   1.144e-04                    89    5                        200
+    6.0            139    6   2.330e-04                   171    7                        392
+    8.0            209    7   2.288e-04                   230    8                        512
