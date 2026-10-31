@@ -87,6 +87,9 @@ with Clarabel (`pip install -r requirements-full.txt`); Lean 4.19.0 for `lean/`.
 
 ## Files
 
+- `block-su2/`: a separate result. The SU(2) plaquette-block mass gap of the four-author paper is extended from
+  β_W ≤ 0.345 to β_W ≤ 0.351 (Arb constants, Lean-checked arithmetic). See `block-su2/SHARPENED.md`.
+- `FRONTIER.md`: the status of the four open items toward the continuum, frontier sources, and ranked next steps.
 - `PROOF.md`: the analytic identification of the certificate with the Wilson Hessian in d = 4.
 - `forest4d.py`: the d = 4 period-2 forest and its period cell.
 - `certificate3d.py`: the u(2) quadratic forms, unchanged from the 3D repository (they do not depend on d).

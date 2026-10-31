@@ -1,0 +1,5 @@
+# mode=sharp  ball r <= 2.106600000  subintervals=200000  series terms=48  prec=128
+# lambda_* >= 0.1563464645   tau <= 0.2500000000   M <= 0.06151713693
+# max_(r<=20beta) |grad g| = r*2phi'(r^2) <= 0.3915316128   (20beta = 1.755500000)
+# phi'' <= 0 on the whole ball: True   [10.1s]
+beta_W=0.3511: w<=0.005772392322 s<=0.2516808393 C<=0.03906092548 K<=0.2849006063 alpha<=1.000286029  FAILS
