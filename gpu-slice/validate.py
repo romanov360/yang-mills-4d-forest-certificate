@@ -131,6 +131,16 @@ def main():
         tf = (time.time() - t) / 20
         print(f"[BENCH] L={L}^4: {ts:.3f} s per sweep (1 heat bath + 3 overrelaxation), "
               f"{tf:.4f} s per RK3 flow step", flush=True)
+        # peak memory of the compiled kernels, as a multiple of the gauge field (scale to other L by (L'/L)^4)
+        field = U.size * U.dtype.itemsize
+        for name, c in (("sweep", Kb["sweep"].lower(U, key, 2.7, masks, 3).compile()),
+                        ("flow", Kb["flow"].lower(U, 0.04, 20).compile())):
+            m = c.memory_analysis()
+            if m is not None:
+                peak = m.argument_size_in_bytes + m.output_size_in_bytes + m.temp_size_in_bytes
+                print(f"[MEM] {name}: peak {peak / 2**20:.0f} MiB = {peak / field:.1f} x the field "
+                      f"({field / 2**20:.0f} MiB); at 48^4: {peak / field * 4 * 48**4 * 4 * U.dtype.itemsize / 2**30:.1f} GiB",
+                      flush=True)
 
     print("ALL PASSED" if ok_all else "SOME CHECKS FAILED", flush=True)
     sys.exit(0 if ok_all else 1)

@@ -119,6 +119,14 @@ On Modal:
     modal run --detach modal_app.py::production         # the plan below, in parallel
     modal volume get su2-slice / ./out && python3 analyse_jax.py out/*.npy
 
+## Memory
+
+The gauge field takes 4 links × 4 floats per site: 324 MiB at 48⁴ in float32 (648 MiB with `--x64`). XLA's
+memory analysis of the compiled kernels, measured on CPU, gives peaks of about 8× the field for an update sweep
+and 11× for a flow step. That is about 3.6 GB at 48⁴, so 48⁴ should fit on 8 GB and 16 GB cards.
+`validate.py --bench L` prints the same analysis for the GPU it runs on (`[MEM]` lines). By default JAX reserves
+75% of GPU memory at start-up. To see the real usage in `nvidia-smi`, set `XLA_PYTHON_CLIENT_PREALLOCATE=false`.
+
 ## Plan and cost
 
 Every run uses a physical box L·a√σ ≈ 2.9–3.2, 500 thermalisation sweeps, 2 sweeps between measurements, and
